@@ -1,4 +1,63 @@
-Відповіді на обов’язкові теоретичні питання:
+# Spotify Data Engineering Project
+
+## 1. Налаштування оточення та запуск
+
+**Крок 1. Встановлення залежностей**
+Для роботи Python-скрипта потрібні наступні бібліотеки:
+\`\`\`bash
+pip install pandas pymongo python-dotenv
+\`\`\`
+
+**Крок 2. Налаштування змінних оточення**
+Створіть файл \`.env\` у корені проєкту та додайте ваш рядок підключення до MongoDB Atlas:
+\`\`\`env
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
+\`\`\`
+
+**Крок 3. Порядок запуску скриптів**
+1. \`python 01_load_data.py\` — завантаження сирих даних з CSV у колекцію \`tracks_raw\`.
+2. \`02_transform.js\` — ETL-процес: очищення, трансформація та запис у фінальну колекцію \`tracks\`.
+3. Запуск аналітичних запитів: \`queries/part2_queries.js\`, \`queries/part3_aggregations.js\`, \`queries/part4_indexes.js\`.
+
+---
+
+## 2. Схема даних (Підсумкова структура)
+Після виконання ETL-трансформацій (вкладення \`audio_features\` та створення масиву \`artists\`), структура документа в колекції \`tracks\` виглядає наступним чином:
+
+\`\`\`json
+{
+  _id: ObjectId('6a16153bc81692135f68755b'),
+  track_id: '5SuOikwiRyPMVoIQDJUgSV',
+  album_name: 'Comedy',
+  track_name: 'Comedy',
+  popularity: NumberInt('73'),
+  explicit: false,
+  track_genre: 'acoustic',
+  artists: [
+    'Gen Hoshino'
+  ],
+  audio_features: {
+    danceability: Double('0.676'),
+    energy: Double('0.461'),
+    loudness: Double('-6.746'),
+    speechiness: Double('0.143'),
+    acousticness: Double('0.0322'),
+    instrumentalness: Double('0.00000101'),
+    liveness: Double('0.358'),
+    valence: Double('0.715'),
+    tempo: Double('87.917'),
+    key: NumberInt('1'),
+    mode: NumberInt('0'),
+    time_signature: NumberInt('4')
+  },
+  duration_sec: Double('230.7'),
+  popularity_tier: 'high'
+}
+\`\`\`
+
+---
+
+## 3. Відповіді на теоретичні питання:
 
 Частина 1
 
@@ -52,7 +111,17 @@
     Перевірено документів: 354
     Час виконання (мс): 2
 
-Завдання 3. Покривний запит
+Завдання 2. Індекс для фонової музики:
+
+   Було створено індекс: { "explicit": 1, "audio_features.instrumentalness": 1, "audio_features.speechiness": 1 }.
+    - Метод пошуку: FETCH (з використанням IXSCAN)
+    - Реально знайдено документів: 16172
+    - Перевірено документів: 16172
+    - Час виконання (мс): 74
+
+Висновок: Показники знайдених та перевірених документів майже співпадають. Це означає, що поле explicit (Equality) першим відсікло зайве, а діапазонний пошук спрацював максимально ефективно.
+
+Завдання 3. Покривний запит:
 
 - Ні, цей запит не є покривним (covered query).
 
