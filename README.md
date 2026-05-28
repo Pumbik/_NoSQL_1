@@ -3,18 +3,21 @@
 ## 1. Налаштування оточення та запуск
 
 **Крок 1. Встановлення залежностей**
+
 Для роботи Python-скрипта потрібні наступні бібліотеки:
 \`\`\`bash
 pip install pandas pymongo python-dotenv
 \`\`\`
 
 **Крок 2. Налаштування змінних оточення**
+
 Створіть файл \`.env\` у корені проєкту та додайте ваш рядок підключення до MongoDB Atlas:
 \`\`\`env
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
 \`\`\`
 
 **Крок 3. Порядок запуску скриптів**
+
 1. \`python 01_load_data.py\` — завантаження сирих даних з CSV у колекцію \`tracks_raw\`.
 2. \`02_transform.js\` — ETL-процес: очищення, трансформація та запис у фінальну колекцію \`tracks\`.
 3. Запуск аналітичних запитів: \`queries/part2_queries.js\`, \`queries/part3_aggregations.js\`, \`queries/part4_indexes.js\`.
